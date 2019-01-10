@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.1.3)
 # Set project name, version and laguages here. (change as needed)
 # Version numbers are available by including "exampleConfig.h" in 
 # the source. See exampleConfig.h.in for some more details.
-project(CPP_BOILERPLATE VERSION 1.2.3.4 LANGUAGES C CXX)
+project(EigenNN VERSION 0.0.0.1 LANGUAGES CXX)
 
 
 # Include stuff. No change needed.
@@ -45,7 +45,9 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/tests
     ${PROJECT_SOURCE_DIR}/external/googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/include)
+    ${PROJECT_SOURCE_DIR}/external/googletest/include
+    ${PROJECT_SOURCE_DIR}/external/eigen
+    ${PROJECT_SOURCE_DIR}/external/eigen/Eigen)
 
 # Make variables referring to all the sources and test files.
 file(GLOB SOURCES "src/*.cpp")
@@ -59,14 +61,6 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable (change if you w
 # --------------------------------------------------------------------------------
 # Compile all sources into a library. Called engine here (change if you wish).
 add_library( engine ${SOURCES} )
-
-# Add an executable for the file main.cpp, here called main.x.
-# If you add more executables, copy these three lines accordingly.
-add_executable(main.x app/main.cpp)   # Name of exec. and location of file.
-add_dependencies(main.x engine)       # main.cpp uses the 'engine', add dep.
-target_link_libraries(main.x engine)  # Link the executable to the 'engine'.
-
-
 
 # --------------------------------------------------------------------------------
 #                         Make Tests (no change needed).
@@ -134,8 +128,8 @@ set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_
 # correct definitions. Here only used to make version number available to
 # the source code. Include "exampleConfig.h" (no .in suffix) in the source.
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/exampleConfig.h.in"
-  "${PROJECT_BINARY_DIR}/exampleConfig.h")
+  "${PROJECT_SOURCE_DIR}/include/config.hpp.in"
+  "${PROJECT_BINARY_DIR}/config.hpp")
 # add the binary tree to the search path for include files
 # so that we will find exampleConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
