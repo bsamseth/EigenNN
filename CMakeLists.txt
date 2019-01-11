@@ -47,11 +47,13 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/external/googletest
     ${PROJECT_SOURCE_DIR}/external/googletest/include
     ${PROJECT_SOURCE_DIR}/external/eigen
-    ${PROJECT_SOURCE_DIR}/external/eigen/Eigen)
+    ${PROJECT_SOURCE_DIR}/external/eigen/Eigen
+    ${PROJECT_SOURCE_DIR}/external/pybind
+    ${PROJECT_SOURCE_DIR}/external/pybind/pybind11)
 
 # Make variables referring to all the sources and test files.
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB PYTHON_SOURCES "src/py*.cpp")
+file(GLOB SOURCES "src/example.cpp")
+file(GLOB PYTHON_SOURCES "src/pyexample.cpp")
 file(GLOB TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable (change if you wish).
 
