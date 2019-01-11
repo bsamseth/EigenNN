@@ -51,6 +51,7 @@ include_directories(
 
 # Make variables referring to all the sources and test files.
 file(GLOB SOURCES "src/*.cpp")
+file(GLOB PYTHON_SOURCES "src/py*.cpp")
 file(GLOB TESTFILES "tests/*.cpp")
 set(TEST_MAIN unit_tests.x)  # Default name for test executable (change if you wish).
 
@@ -61,6 +62,10 @@ set(TEST_MAIN unit_tests.x)  # Default name for test executable (change if you w
 # --------------------------------------------------------------------------------
 # Compile all sources into a library. Called engine here (change if you wish).
 add_library( engine ${SOURCES} )
+
+# Compile Python bindings.
+add_subdirectory(external)  # Includes external/pybind
+pybind11_add_module(qflow ${PYTHON_SOURCES})
 
 # --------------------------------------------------------------------------------
 #                         Make Tests (no change needed).
