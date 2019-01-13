@@ -5,34 +5,29 @@
 
 namespace layer {
 
-template<unsigned Inputs, unsigned Outputs, typename ActFunc>
 class DenseLayer {
+    protected:
+        Matrix W;
+        Matrix W_grad;
+        RowVector b;
+        RowVector b_grad;
+        Matrix inputs;
+        Matrix outputs;
+        Matrix delta;
+        const activation::ActivationFunction* actFunc;
+
     public:
-        Eigen::Matrix<Real, Inputs, Outputs, Eigen::RowMajor> W;
-        Eigen::Matrix<Real, Inputs, Outputs, Eigen::RowMajor> W_grad;
-        Eigen::Matrix<Real, 1, Outputs, Eigen::RowMajor> b;
-        Eigen::Matrix<Real, 1, Outputs, Eigen::RowMajor> b_grad;
-        Eigen::Matrix<Real, Eigen::Dynamic, Inputs, Eigen::RowMajor> inputs;
-        Eigen::Matrix<Real, Eigen::Dynamic, Outputs, Eigen::RowMajor> outputs;
-        Eigen::Matrix<Real, Eigen::Dynamic, Outputs, Eigen::RowMajor> delta;
-        ActFunc actFunc;
 
+        DenseLayer(int inputs, int outputs, const activation::ActivationFunction& actFunc);
+        const Matrix& forward(const MatrixRef& x);
+        Matrix backward(const MatrixRef& error);
 
-        template<typename Derived>
-        auto& forward(const Eigen::MatrixBase<Derived>& x) {
-            inputs = x;
-            return outputs = actFunc.evaluate((inputs * W).rowwise() + b);
-        }
-
-        template<typename Derived>
-        auto backward(const Eigen::MatrixBase<Derived>& error) {
-            delta = error.cwiseProduct(actFunc.derivative(outputs));
-
-            W_grad = inputs.transpose() * delta;
-            b_grad = delta.colwise().mean();
-
-            return delta * W.transpose();
-        }
+        // Getters
+        const Matrix& getOutputs();
 };
+
+inline const Matrix& DenseLayer::getOutputs() {
+    return outputs;
+}
 
 }
