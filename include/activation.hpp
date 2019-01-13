@@ -5,22 +5,33 @@
 
 namespace activation {
 
-template<typename F, typename DF, typename DDF>
 class ActivationFunction {
     public:
-        template<typename Derived>
-        auto evaluate(const Eigen::DenseBase<Derived>& x) const {
-            return x.unaryExpr(F{});
+
+        virtual Matrix evaluate(const MatrixRef& x) const = 0;
+        virtual Matrix derivative(const MatrixRef& x) const = 0;
+        virtual Matrix dblDerivative(const MatrixRef& x) const = 0;
+};
+
+
+template<typename F, typename DF, typename DDF>
+class DerivedActivationFunction : public ActivationFunction {
+    private:
+        const F f{};
+        const DF df{};
+        const DDF ddf{};
+
+    public:
+        Matrix evaluate(const MatrixRef& x) const override {
+            return x.unaryExpr(f);
         }
 
-        template<typename Derived>
-        auto derivative(const Eigen::DenseBase<Derived>& y) const {
-            return y.unaryExpr(DF{});
+        Matrix derivative(const MatrixRef& y) const override {
+            return y.unaryExpr(df);
         }
 
-        template<typename Derived>
-        auto dblDerivative(const Eigen::DenseBase<Derived>& y) const {
-            return y.unaryExpr(DDF{});
+        Matrix dblDerivative(const MatrixRef& y) const override {
+            return y.unaryExpr(ddf);
         }
 };
 
@@ -28,17 +39,17 @@ namespace functors {
 
 namespace relu {
 struct eval {
-    Real operator() (Real x) const {
+    constexpr Real operator() (Real x) const {
         return x > 0 ? x : 0;
     }
 };
 struct deriv {
-    Real operator() (Real y) const {
+    constexpr Real operator() (Real y) const {
         return y > 0 ? 1 : 0;
     }
 };
 struct dblDeriv {
-    Real operator() (Real y) const {
+    constexpr Real operator() (Real y) const {
         (void) y;
         return 0;
     }
@@ -47,18 +58,18 @@ struct dblDeriv {
 
 namespace identity {
 struct eval {
-    Real operator() (Real x) const {
+    constexpr Real operator() (Real x) const {
         return x;
     }
 };
 struct deriv {
-    Real operator() (Real y) const {
+    constexpr Real operator() (Real y) const {
         (void) y;
         return 1;
     }
 };
 struct dblDeriv {
-    Real operator() (Real y) const {
+    constexpr Real operator() (Real y) const {
         (void) y;
         return 0;
     }
@@ -67,17 +78,17 @@ struct dblDeriv {
 
 namespace sigmoid {
 struct eval {
-    Real operator() (Real x) const {
+    constexpr Real operator() (Real x) const {
         return 1 / (1 + std::exp(-x));
     }
 };
 struct deriv {
-    Real operator() (Real y) const {
+    constexpr Real operator() (Real y) const {
         return y * (1 - y);
     }
 };
 struct dblDeriv {
-    Real operator() (Real y) const {
+    constexpr Real operator() (Real y) const {
         return y * (1 - y) * (1 - 2*y);
     }
 };
@@ -85,9 +96,13 @@ struct dblDeriv {
 }
 
 
-using Relu = ActivationFunction<functors::relu::eval, functors::relu::deriv, functors::relu::dblDeriv>;
-using Identity = ActivationFunction<functors::identity::eval, functors::identity::deriv, functors::identity::dblDeriv>;
-using Sigmoid = ActivationFunction<functors::sigmoid::eval, functors::sigmoid::deriv, functors::sigmoid::dblDeriv>;
+using ReluActivation = DerivedActivationFunction<functors::relu::eval, functors::relu::deriv, functors::relu::dblDeriv>;
+using IdentityActivation = DerivedActivationFunction<functors::identity::eval, functors::identity::deriv, functors::identity::dblDeriv>;
+using SigmoidActivation = DerivedActivationFunction<functors::sigmoid::eval, functors::sigmoid::deriv, functors::sigmoid::dblDeriv>;
+
+extern ReluActivation relu;
+extern IdentityActivation identity;
+extern SigmoidActivation sigmoid;
 
 }
 
