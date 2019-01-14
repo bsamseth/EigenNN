@@ -61,7 +61,9 @@ set(SOURCES
     "src/layer.cpp"
 )
 set(PYTHON_SOURCES
-    "src/pyexample.cpp"
+    "py_src/pymain.cpp"
+    "py_src/pyactivation.cpp"
+    "py_src/pylayer.cpp"
 )
 
 
@@ -74,7 +76,7 @@ add_library( engine ${SOURCES} )
 
 # Compile Python bindings.
 add_subdirectory(external)  # Includes external/pybind
-pybind11_add_module(qflow ${PYTHON_SOURCES})
+pybind11_add_module(qflow ${PYTHON_SOURCES} ${SOURCES})
 
 # --------------------------------------------------------------------------------
 #                         Make Tests (no change needed).
