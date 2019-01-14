@@ -7,9 +7,16 @@
 class Dnn {
     protected:
 
+        unsigned paramCount = 0;
         std::vector<layer::DenseLayer> layers;
+        Vector paramGradient;
 
-    public:
+
+        /**
+         * Forward propagation of input (evaluation of network).
+         */
+        void forward(const MatrixRef& x);
+
         /**
          * Calculate derivative of output w.r.t. each component of the DNN.
          *
@@ -24,5 +31,6 @@ class Dnn {
 
         void addLayer(layer::DenseLayer layer);
         const Matrix& evaluate(const MatrixRef& x);
+        const Vector& parameterGradient(const MatrixRef& x);
 };
 
