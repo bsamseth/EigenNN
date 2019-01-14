@@ -25,9 +25,21 @@ Matrix DenseLayer::backward(const MatrixRef& error)
     delta = error.cwiseProduct(actFunc->derivative(outputs));
 
     W_grad = inputs.transpose() * delta;
-    b_grad = delta.colwise().mean();
+    b_grad = delta.colwise().sum();
 
     return delta * W.transpose();
+}
+
+Matrix DenseLayer::forwardGradient(const MatrixRef& dadx_j)
+{
+    return actFunc->derivative(outputs).cwiseProduct(dadx_j * W);
+}
+
+Matrix DenseLayer::forwardLaplace(const MatrixRef& ddaddx_j, const MatrixRef& dadx_j)
+{
+    const auto first  = actFunc->derivative(outputs).cwiseProduct(ddaddx_j * W);
+    const auto second = actFunc->dblDerivative(outputs).cwiseProduct((dadx_j * W).array().square().matrix());
+    return first + second;
 }
 
 }

@@ -20,5 +20,9 @@ void init_layer(py::module& main) {
     py::class_<layer::DenseLayer>(m, "DenseLayer")
         .def(py::init<int, int, const activation::ActivationFunction&>(),
                 py::arg("inputs"), py::arg("outputs"), py::arg("activation") = activation::identity)
-        .def("evaluate", &layer::DenseLayer::forward);
+        .def("evaluate", &layer::DenseLayer::forward)
+        .def_property_readonly("weights", &layer::DenseLayer::getWeights)
+        .def_property_readonly("biases", &layer::DenseLayer::getBiases)
+        .def_property_readonly("weights_gradient", &layer::DenseLayer::getWeightsGradient)
+        .def_property_readonly("bias_gradient", &layer::DenseLayer::getBiasGradient);
 }

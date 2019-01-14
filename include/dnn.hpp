@@ -10,7 +10,7 @@ class Dnn {
         unsigned paramCount = 0;
         std::vector<layer::DenseLayer> layers;
         Vector paramGradient;
-
+        Vector inputGradient;
 
         /**
          * Forward propagation of input (evaluation of network).
@@ -29,8 +29,40 @@ class Dnn {
 
     public:
 
+        /**
+         * Append a layer to the network.
+         */
         void addLayer(layer::DenseLayer layer);
+
+        /**
+         * Returns the output of the network for the input x.
+         */
         const Matrix& evaluate(const MatrixRef& x);
+
+        /**
+         * Returns the gradient of the output w.r.t. all parameters
+         * in the network, summed over the rows of x, where each
+         * row of x makes up one sample input.
+         */
         const Vector& parameterGradient(const MatrixRef& x);
+
+        /**
+         * Returns the gradient of the output w.r.t. the input X,
+         * summed over the rows of X, where each row in X makes up one
+         * sample input.
+         */
+        const Vector& gradient(const MatrixRef& x);
+
+        /**
+         * Return the lapliacian of the output w.r.t. the inputs x
+         * summed over the rows of X.
+         */
+        Real laplace(const MatrixRef& x);
+
+        // Getters.
+        const std::vector<layer::DenseLayer>& getLayers() const;
 };
 
+inline const std::vector<layer::DenseLayer>& Dnn::getLayers() const {
+    return layers;
+}

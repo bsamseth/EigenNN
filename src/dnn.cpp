@@ -1,10 +1,15 @@
 #include <cassert>
+#include <iostream>
 #include "dnn.hpp"
 
 void Dnn::addLayer(layer::DenseLayer layer) {
     layers.push_back(layer);
     paramCount += layer.getNumberOfParameter();
+    paramGradient.resize(paramCount);
 
+    if (layers.size() == 1)
+        // inputGradient has size equal to the inputs to the first layer.
+        inputGradient.resize(layer.getWeights().rows());
 }
 
 const Matrix& Dnn::evaluate(const MatrixRef& x) {
@@ -21,11 +26,55 @@ const Vector& Dnn::parameterGradient(const MatrixRef& x) {
         for (unsigned i = 0; i < W_grad.size(); ++i)
             paramGradient(k++) = W_grad.data()[i];
         const auto& b_grad = layer.getBiasGradient();
-        for (unsigned i = 0; i < W_grad.size(); ++i)
+        for (unsigned i = 0; i < b_grad.size(); ++i)
             paramGradient(k++) = b_grad[i];
     }
     assert(k == paramCount);
     return paramGradient;
+}
+
+const Vector& Dnn::gradient(const MatrixRef& x) {
+    forward(x);
+
+    for (int j = 0; j < x.cols(); ++j) {
+        Matrix dadx_j = Matrix::Zero(x.rows(), x.cols());
+        dadx_j.col(j) = Matrix::Constant(x.rows(), 1, 1);
+        for (auto& layer : layers) {
+            dadx_j = layer.forwardGradient(dadx_j);
+        }
+        // Note, we assume that the output of the network is scalar.
+        // If we need non-scalar outputs at some point, then this must be
+        // rethinked in terms of what we want to mean by the gradient of a vector
+        // output wrt. a matrix input.
+        assert(dadx_j.size() == x.rows());
+        inputGradient(j) = dadx_j.sum();
+    }
+    return inputGradient;
+}
+
+Real Dnn::laplace(const MatrixRef& x) {
+    forward(x);
+
+    Real res = 0;
+
+    for (int j = 0; j < x.cols(); ++j) {
+        Matrix ddaddx_j = Matrix::Zero(x.rows(), x.cols());
+        Matrix dadx_j   = Matrix::Zero(x.rows(), x.cols());
+        dadx_j.col(j)   = Matrix::Constant(x.rows(), 1, 1);
+
+        std::cout << "\n\n j = " << j << std::endl;
+        std::cout << "ddaddx_j=" << ddaddx_j << "\n";
+        std::cout << "dadx_j=" << dadx_j << "\n";
+        for (auto& layer : layers) {
+            ddaddx_j = layer.forwardLaplace(ddaddx_j, dadx_j);
+            dadx_j = layer.forwardGradient(dadx_j);
+            std::cout << "ddaddx_j=" << ddaddx_j << "\n";
+            std::cout << "dadx_j=" << dadx_j << "\n";
+        }
+        res += ddaddx_j.sum();
+    }
+
+    return res;
 }
 
 
@@ -40,6 +89,7 @@ void Dnn::forward(const MatrixRef& x) {
 }
 
 void Dnn::backward() {
+    assert(layers.size() > 0);
     const auto& output = layers[layers.size() - 1].getOutputs();
     Matrix y = Matrix::Ones(output.rows(), output.cols());
     for (auto it = layers.rbegin(); it != layers.rend(); ++it) {

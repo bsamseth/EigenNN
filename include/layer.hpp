@@ -21,9 +21,13 @@ class DenseLayer {
         DenseLayer(int inputs, int outputs, const activation::ActivationFunction& actFunc);
         const Matrix& forward(const MatrixRef& x);
         Matrix backward(const MatrixRef& error);
+        Matrix forwardGradient(const MatrixRef& dadx_j_prev);
+        Matrix forwardLaplace(const MatrixRef& ddaddx_j, const MatrixRef& dadx_j);
 
         // Getters
         const Matrix& getOutputs() const;
+        const Matrix& getWeights() const;
+        const RowVector& getBiases() const;
         const Matrix& getWeightsGradient() const;
         const RowVector& getBiasGradient() const;
         unsigned getNumberOfParameter() const;
@@ -31,6 +35,12 @@ class DenseLayer {
 
 inline const Matrix& DenseLayer::getOutputs() const {
     return outputs;
+}
+inline const Matrix& DenseLayer::getWeights() const {
+    return W;
+}
+inline const RowVector& DenseLayer::getBiases() const {
+    return b;
 }
 inline unsigned DenseLayer::getNumberOfParameter() const {
     return W.size() + b.size();

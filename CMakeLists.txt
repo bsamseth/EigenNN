@@ -64,6 +64,7 @@ set(PYTHON_SOURCES
     "py_src/pymain.cpp"
     "py_src/pyactivation.cpp"
     "py_src/pylayer.cpp"
+    "py_src/pydnn.cpp"
 )
 
 
