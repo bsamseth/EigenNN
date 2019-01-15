@@ -69,10 +69,11 @@ if __name__ == '__main__':
         version='1.0.0',
         author='Bendik Samseth',
         author_email='b.samseth@gmail.com',
-        description='',
+        description='Neural Network for Quantum Variational Monte Carlo',
         long_description='',
         ext_modules=[CMakeExtension(PACKAGE_NAME)],
         cmdclass=dict(build_ext=CMakeBuild),
         zip_safe=False,
         test_suite='setup.load_test_suite',
+        tests_require=['numpy', 'autograd'],
     )
