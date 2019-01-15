@@ -23,13 +23,19 @@ def sigmoid_dbl_deriv(u):
 def relu_np(x):
     return auto_np.maximum(0, x)
 
+def relu_deriv(y):
+    return auto_np.where(y > 0, 1, 0)
+
+def relu_dbl_deriv(y):
+    return y * 0
+
 
 class TestDnn(unittest.TestCase):
     def setUp(self):
         auto_np.random.seed(1234)
         self.nn = Dnn()
         self.nn.add_layer(DenseLayer(2, 3, activation=sigmoid))
-        self.nn.add_layer(DenseLayer(3, 4, activation=sigmoid))
+        self.nn.add_layer(DenseLayer(3, 4, activation=relu))
         self.nn.add_layer(DenseLayer(4, 1))
 
         self.W1 = self.nn.layers[0].weights
@@ -44,7 +50,7 @@ class TestDnn(unittest.TestCase):
         def f(x, w1, b1, w2, b2, w3, b3):
             z1 = x @ w1 + b1
             z2 = sigmoid_np(z1) @ w2 + b2
-            z3 = sigmoid_np(z2) @ w3 + b3
+            z3 = relu_np(z2) @ w3 + b3
             return z3
 
         self.f_np = f
