@@ -3,11 +3,16 @@ import re
 import sys
 import platform
 import subprocess
+import unittest
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
+def load_test_suite():
+    test_loader = unittest.TestLoader()
+    test_suite = test_loader.discover('tests', pattern='test_*.py')
+    return test_suite
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -56,14 +61,16 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
 
-setup(
-    name='qflow',
-    version='0.0.1',
-    author='Bendik Samseth',
-    author_email='b.samseth@gmail.com',
-    description='',
-    long_description='',
-    ext_modules=[CMakeExtension('qflow')],
-    cmdclass=dict(build_ext=CMakeBuild),
-    zip_safe=False,
-)
+if __name__ == '__main__':
+    setup(
+        name='qflow',
+        version='1.0.0',
+        author='Bendik Samseth',
+        author_email='b.samseth@gmail.com',
+        description='',
+        long_description='',
+        ext_modules=[CMakeExtension('qflow')],
+        cmdclass=dict(build_ext=CMakeBuild),
+        zip_safe=False,
+        test_suite='setup.load_test_suite',
+    )
