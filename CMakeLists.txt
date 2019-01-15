@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.1.3)
 # Set project name, version and laguages here. (change as needed)
 # Version numbers are available by including "exampleConfig.h" in 
 # the source. See exampleConfig.h.in for some more details.
-project(EigenNN VERSION 0.0.0.1 LANGUAGES CXX)
+project(EigenNN VERSION 1.0.0.0 LANGUAGES CXX)
 
 
 # Include stuff. No change needed.
@@ -44,16 +44,10 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/tests
-    ${PROJECT_SOURCE_DIR}/external/googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/include
     ${PROJECT_SOURCE_DIR}/external/eigen
     ${PROJECT_SOURCE_DIR}/external/eigen/Eigen
     ${PROJECT_SOURCE_DIR}/external/pybind
     ${PROJECT_SOURCE_DIR}/external/pybind/include/pybind11)
-
-# Make variables referring to all the test files.
-file(GLOB TESTFILES "tests/*.cpp")
-set(TEST_MAIN unit_tests.x)  # Default name for test executable (change if you wish).
 
 set(SOURCES
     "src/activation.cpp"
@@ -72,36 +66,13 @@ set(PYTHON_SOURCES
 # --------------------------------------------------------------------------------
 #                            Build! (Change as needed)
 # --------------------------------------------------------------------------------
-# Compile all sources into a library. Called engine here (change if you wish).
-add_library( engine ${SOURCES} )
-
 # Compile Python bindings.
 add_subdirectory(external)  # Includes external/pybind
 pybind11_add_module(qflow ${PYTHON_SOURCES} ${SOURCES})
 
 # --------------------------------------------------------------------------------
-#                         Make Tests (no change needed).
-# --------------------------------------------------------------------------------
-# Add a make target 'gtest', that runs the tests (and builds all dependencies).
-# The setup of Google Test is done at the very end of this file.
-add_executable(${TEST_MAIN} ${TESTFILES})
-add_dependencies(${TEST_MAIN} googletest engine)
-target_link_libraries(${TEST_MAIN} googletest engine pthread)
-add_custom_target(gtest 
-    COMMAND "${PROJECT_BINARY_DIR}/${TEST_MAIN}"
-    DEPENDS engine ${TEST_MAIN})
-
-
-# Add a standard make target 'test' that runs the tests under CTest (only as an alt. to gtest).
-include(CTest)
-enable_testing()
-add_test(unit_tests ${PROJECT_BINARY_DIR}/${TEST_MAIN})
-
-# --------------------------------------------------------------------------------
 #                         Code Coverage (no change needed).
 # --------------------------------------------------------------------------------
-# If CMake aborts due to missing dependencies for code coverage 
-# (gcov, lcov, genhtml and supported compiler), comment this line.
 include(CodeCoverage)
 
 # --------------------------------------------------------------------------------
@@ -129,14 +100,6 @@ add_custom_target( git_update
     COMMAND git submodule init
     COMMAND git submodule update
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} )
-add_library( googletest
-    ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc
-    ${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc )
-add_dependencies(googletest git_update)
-set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest-all.cc  PROPERTIES GENERATED 1)
-set_source_files_properties(${PROJECT_SOURCE_DIR}/external/googletest/src/gtest_main.cc PROPERTIES GENERATED 1)
-
-
 
 # --------------------------------------------------------------------------------
 #                            Misc (no change needed).
