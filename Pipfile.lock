@@ -25,7 +25,6 @@
         },
         "future": {
             "hashes": [
-                "sha256:09dc880d6ec00526ad7877c09fc721e845aeb4f68763353b5ad2e322b3479015",
                 "sha256:67045236dcfd6816dc439556d009594abf643e5eb48992e36beac09c2ca659b8"
             ],
             "version": "==0.17.1"
