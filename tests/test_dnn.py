@@ -10,6 +10,10 @@ from qflow.activation import sigmoid, relu
 
 def sigmoid_np(x):
     return 1 / (1 + auto_np.exp(-x))
+def sigmoid_deriv(u):
+    return u * (1-u)
+def sigmoid_dbl_deriv(u):
+    return u * (1-u) * (1-2*u)
 def relu_np(x):
     return auto_np.maximum(0, x)
 
@@ -18,7 +22,7 @@ class TestDnn(unittest.TestCase):
         auto_np.random.seed(1234)
         self.nn = Dnn()
         self.nn.add_layer(DenseLayer(2, 3, activation=sigmoid))
-        self.nn.add_layer(DenseLayer(3, 4, activation=relu))
+        self.nn.add_layer(DenseLayer(3, 4, activation=sigmoid))
         self.nn.add_layer(DenseLayer(4, 1))
 
         self.W1 = self.nn.layers[0].weights
@@ -37,7 +41,7 @@ class TestDnn(unittest.TestCase):
         def f(x, w1, b1, w2, b2, w3, b3):
             z1 = x @ w1 + b1
             z2 = sigmoid_np(z1) @ w2 + b2
-            z3 = relu_np(z2) @ w3 + b3
+            z3 = sigmoid_np(z2) @ w3 + b3
             return z3
 
         self.f_np = f
@@ -79,11 +83,14 @@ class TestDnn(unittest.TestCase):
             np.testing.assert_almost_equal(auto_gradient, self.nn.gradient(x))
 
     def test_laplace(self):
-        x = auto_np.random.randn(1, 2)
-        print(self.nn.laplace(x))
-        print(hessian(self.f_np)(x, *self.params))
-        print('target', sum(np.trace(hessian(self.f_np)(x[i], *self.params)[0]) for i in range(x.shape[0])))
+        hess = hessian(self.f_np)
+        for _ in range(10):
+            x = auto_np.random.randn(50, 2)  # Autograd hessian slow, less testing.
 
+            # Need to feed autograd hessian one row at a time and sum results.
+            expected = sum(np.trace(hess(x[i], *self.params)[0]) for i in range(x.shape[0]))
+
+            self.assertAlmostEqual(expected, self.nn.laplace(x))
 
 
 

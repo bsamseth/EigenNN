@@ -1,3 +1,4 @@
+#include <iostream>
 #include "layer.hpp"
 
 namespace layer {
@@ -37,8 +38,11 @@ Matrix DenseLayer::forwardGradient(const MatrixRef& dadx_j)
 
 Matrix DenseLayer::forwardLaplace(const MatrixRef& ddaddx_j, const MatrixRef& dadx_j)
 {
-    const auto first  = actFunc->derivative(outputs).cwiseProduct(ddaddx_j * W);
-    const auto second = actFunc->dblDerivative(outputs).cwiseProduct((dadx_j * W).array().square().matrix());
+    // For some reason, Eigen needs to evaluate both parts as matrices completely
+    // before they can be summed. Letting 'first' be auto we get wrong answers, while
+    // letting second be auto does not compile. Strange, but this way works!
+    Matrix first  = actFunc->derivative(outputs).cwiseProduct(ddaddx_j * W);
+    Matrix second = actFunc->dblDerivative(outputs).array() * (dadx_j * W).array().square();
     return first + second;
 }
 

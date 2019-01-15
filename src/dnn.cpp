@@ -62,14 +62,9 @@ Real Dnn::laplace(const MatrixRef& x) {
         Matrix dadx_j   = Matrix::Zero(x.rows(), x.cols());
         dadx_j.col(j)   = Matrix::Constant(x.rows(), 1, 1);
 
-        std::cout << "\n\n j = " << j << std::endl;
-        std::cout << "ddaddx_j=" << ddaddx_j << "\n";
-        std::cout << "dadx_j=" << dadx_j << "\n";
         for (auto& layer : layers) {
             ddaddx_j = layer.forwardLaplace(ddaddx_j, dadx_j);
             dadx_j = layer.forwardGradient(dadx_j);
-            std::cout << "ddaddx_j=" << ddaddx_j << "\n";
-            std::cout << "dadx_j=" << dadx_j << "\n";
         }
         res += ddaddx_j.sum();
     }
