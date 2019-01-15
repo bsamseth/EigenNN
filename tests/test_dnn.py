@@ -59,7 +59,7 @@ class TestDnn(unittest.TestCase):
     def test_parameter_gradients(self):
         for _ in range(10):
             x = auto_np.random.randn(500, 2)
-            grads = self.nn.parameterGradient(x)
+            grads = self.nn.parameter_gradient(x)
 
             # Compute gradients using autograd
             auto_grads = []

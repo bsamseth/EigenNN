@@ -13,7 +13,7 @@ void init_dnn(py::module& m) {
         .def(py::init<>())
         .def("add_layer", &Dnn::addLayer)
         .def("evaluate", &Dnn::evaluate)
-        .def("parameterGradient", &Dnn::parameterGradient)
+        .def("parameter_gradient", &Dnn::parameterGradient)
         .def("gradient", &Dnn::gradient)
         .def("laplace", &Dnn::laplace)
         .def_property_readonly("layers", &Dnn::getLayers);
