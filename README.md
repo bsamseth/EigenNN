@@ -12,6 +12,10 @@ The structure is modular and allows to add arbitrary layers and arbitrary
 activation functions. It's built with Eigen in order to be as efficient as possible, 
 although not a lot of emphasis has been placed on optimizing.
 
+__NOTE__: This package is not complete, both in functionality and
+documentation. It is used within my Master's thesis project, over at
+[github.com/bsamseth/thesis]
+
 ## Usage Example
 The use of this is not seen by it self, but for reference, this is how the module could be used.
 ```python
