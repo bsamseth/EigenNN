@@ -61,58 +61,19 @@ set(PYTHON_SOURCES
     "py_src/pydnn.cpp"
 )
 
-
-
-# --------------------------------------------------------------------------------
-#                            Build! (Change as needed)
-# --------------------------------------------------------------------------------
-# Compile Python bindings.
-add_subdirectory(external)  # Includes external/pybind
-pybind11_add_module(qflow ${PYTHON_SOURCES} ${SOURCES})
-
-# --------------------------------------------------------------------------------
-#                         Code Coverage (no change needed).
-# --------------------------------------------------------------------------------
 include(CodeCoverage)
 
-# --------------------------------------------------------------------------------
-#                         Documentation (no change needed).
-# --------------------------------------------------------------------------------
-# Add a make target 'doc' to generate API documentation with Doxygen.
-# You should set options to your liking in the file 'Doxyfile.in'.
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    add_custom_target(doc 
-        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile &> doxygen.log
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "${BoldMagenta}Generating API documentation with Doxygen (open ./html/index.html to view).${ColourReset}" VERBATIM
-        )
-endif(DOXYGEN_FOUND)
-
-
-# --------------------------------------------------------------------------------
-#                         Google Test (no change needed).
-# --------------------------------------------------------------------------------
-# The following makes sure that an up-to-date version of googletest is available,
-# and built so that it may be used by your tests. 
+# The following makes sure that an up-to-date version of submodules are available.
 add_custom_target( git_update
     COMMAND git submodule init
     COMMAND git submodule update
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} )
 
-# --------------------------------------------------------------------------------
-#                            Misc (no change needed).
-# --------------------------------------------------------------------------------
-# Have CMake parse the config file, generating the config header, with
-# correct definitions. Here only used to make version number available to
-# the source code. Include "exampleConfig.h" (no .in suffix) in the source.
-configure_file (
-  "${PROJECT_SOURCE_DIR}/include/config.hpp.in"
-  "${PROJECT_BINARY_DIR}/config.hpp")
-# add the binary tree to the search path for include files
-# so that we will find exampleConfig.h
-include_directories("${PROJECT_BINARY_DIR}")
+
+# Compile Python bindings.
+add_subdirectory(external)  # Includes external/pybind
+pybind11_add_module(EigenNN ${PYTHON_SOURCES} ${SOURCES})
+add_dependencies(EigenNN git_update)
 
 # Ask CMake to output a compile_commands.json file for use with things like Vim YCM.
 set( CMAKE_EXPORT_COMPILE_COMMANDS 1 )

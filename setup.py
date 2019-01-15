@@ -9,6 +9,8 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
+PACKAGE_NAME = "EigenNN"
+
 def load_test_suite():
     test_loader = unittest.TestLoader()
     test_suite = test_loader.discover('tests', pattern='test_*.py')
@@ -63,13 +65,13 @@ class CMakeBuild(build_ext):
 
 if __name__ == '__main__':
     setup(
-        name='qflow',
+        name=PACKAGE_NAME,
         version='1.0.0',
         author='Bendik Samseth',
         author_email='b.samseth@gmail.com',
         description='',
         long_description='',
-        ext_modules=[CMakeExtension('qflow')],
+        ext_modules=[CMakeExtension(PACKAGE_NAME)],
         cmdclass=dict(build_ext=CMakeBuild),
         zip_safe=False,
         test_suite='setup.load_test_suite',

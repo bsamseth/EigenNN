@@ -10,16 +10,10 @@ void init_activation(py::module&);
 void init_layer(py::module&);
 void init_dnn(py::module&);
 
-PYBIND11_MODULE(qflow, m) {
+PYBIND11_MODULE(EigenNN, m) {
     m.doc() = R"pbdoc(
-        QFlow - Quantum Variational Monte Carlo Framework
+        EigenNN - Neural Networks for Quantum Variational Monte Carlo
         -----------------------
-        .. currentmodule:: qflow
-        .. autosummary::
-           :toctree: _generate
-           activation
-           layer
-           Dnn
     )pbdoc";
 
     init_activation(m);
